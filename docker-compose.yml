@@ -1,12 +1,22 @@
-version: '3.8'
-
 services:
+  # Nginx - reverse proxy + SSL
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - api
+    restart: unless-stopped
+
   # LibreChat - основной чат
   api:
     image: ghcr.io/danny-avila/librechat:v0.7.6
     container_name: librechat
-    ports:
-      - "3080:3080"
     depends_on:
       - mongodb
       - redis
