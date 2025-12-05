@@ -15,8 +15,8 @@ services:
 
   # LibreChat - основной чат
   api:
-    image: ghcr.io/danny-avila/librechat:v0.7.6
-    container_name: librechat
+    image: ghcr.io/danny-avila/librechat:v0.8.0
+    container_name: o2gpt-chat
     depends_on:
       - mongodb
       - redis
@@ -25,6 +25,7 @@ services:
     volumes:
       - ./librechat.yaml:/app/librechat.yaml
       - librechat_images:/app/client/public/images
+      - ./custom.css:/app/client/public/custom.css:ro
     restart: unless-stopped
 
   # MongoDB - база данных
@@ -44,7 +45,62 @@ services:
     command: redis-server --appendonly yes
     restart: unless-stopped
 
+  # O2GPT API - Admin backend
+  o2gpt-api:
+    build:
+      context: ./o2gpt-api
+    container_name: o2gpt-api
+    depends_on:
+      - mongodb
+    environment:
+      - MONGODB_URL=mongodb://mongodb:27017
+      - MONGODB_DB_NAME=o2gpt
+      - LIBRECHAT_MONGODB_URL=mongodb://mongodb:27017
+      - LIBRECHAT_MONGODB_DB_NAME=LibreChat
+      - JWT_SECRET_KEY=${O2GPT_JWT_SECRET:-change-this-secret-key-in-production}
+      - DEBUG=false
+    restart: unless-stopped
+
+  # O2GPT Admin Panel - React frontend
+  o2gpt-admin:
+    build:
+      context: ./o2gpt-admin
+    container_name: o2gpt-admin
+    depends_on:
+      - o2gpt-api
+    restart: unless-stopped
+
+  # MCP сервер для генерации изображений через OpenRouter
+  mcp-image-gen:
+    build:
+      context: ./mcp-servers/openrouter-image-gen
+    container_name: mcp-image-gen
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_KEY}
+    restart: unless-stopped
+
+  # MCP сервер для работы с Word документами (DOCX)
+  mcp-office-word:
+    build:
+      context: ./mcp-servers/office-word
+    container_name: mcp-office-word
+    volumes:
+      - mcp_documents:/app/documents
+    restart: unless-stopped
+
+  # MCP сервер для работы с Excel (XLSX)
+  mcp-excel:
+    build:
+      context: ./mcp-servers/excel
+    container_name: mcp-excel
+    volumes:
+      - mcp_documents:/app/documents
+    environment:
+      - EXCEL_MCP_PAGING_CELLS_LIMIT=4000
+    restart: unless-stopped
+
 volumes:
   mongo_data:
   redis_data:
   librechat_images:
+  mcp_documents:

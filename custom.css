@@ -1,0 +1,78 @@
+/* O2GPT Custom CSS - OpenRouter UI Customization */
+/* Скрывает выбор провайдера и логотип OpenRouter */
+
+/* 1. Скрыть выбор провайдера (endpoint selector) */
+[data-testid="endpoint-menu"],
+[data-testid="endpoint-select"],
+[data-testid="endpoint-selector"],
+.endpoint-selector,
+.endpoint-menu,
+.endpoint-dropdown,
+.provider-dropdown,
+.provider-selector,
+select[class*="endpoint"]:first-of-type {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* 2. Скрыть логотип OpenRouter */
+img[alt*="OpenRouter"],
+img[alt*="openrouter"],
+img[src*="openrouter"],
+img[src*="OpenRouter"],
+.openrouter-logo,
+.provider-logo,
+[class*="openrouter" i] img,
+[class*="provider-icon"] {
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: none !important;
+}
+
+/* 3. Расширить селектор моделей на всю ширину */
+.model-selector,
+.model-select,
+.model-select-container,
+.model-dropdown,
+[data-testid="model-select"],
+[data-testid="model-selector"],
+select[class*="model"] {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 1 !important;
+  flex-grow: 1 !important;
+}
+
+/* 4. Скрыть упоминания провайдера в тексте */
+.provider-label,
+.provider-badge,
+.provider-name,
+[aria-label*="provider"],
+[aria-label*="Provider"],
+[aria-label*="endpoint"],
+[aria-label*="Endpoint"] {
+  display: none !important;
+}
+
+/* 5. Скрыть текстовые упоминания "OpenRouter" */
+span:contains("OpenRouter"),
+div:contains("via OpenRouter"),
+p:contains("OpenRouter") {
+  display: none !important;
+}
+
+/* 6. Альтернативные селекторы (fallback) */
+[class*="endpoint"][class*="select"],
+[class*="provider"][class*="select"] {
+  display: none !important;
+}
+
+/* 7. Убрать разделители между провайдером и моделью */
+.model-selector-divider,
+.provider-model-divider,
+[class*="divider"][class*="provider"] {
+  display: none !important;
+}
